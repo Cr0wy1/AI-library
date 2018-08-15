@@ -2,6 +2,7 @@
 #define GRID_H
 #include <QDebug>
 #include <math.h>
+#include <string>
 
 
 //TODO make Rows and Cols parameter in Template
@@ -66,8 +67,9 @@ public:
 
     }
 
+
     template<class T2>
-    Grid(const Grid<T2> &other){
+    Grid(Grid<T2> &other){
         //qDebug() << "COPY CONSTRUCTOR";
         Rows = other.rows();
         Cols = other.cols();
@@ -76,6 +78,14 @@ public:
         values = new T[Size];
 
         std::copy(other.values, other.values+Size, values);
+    }
+
+    static Grid<double> ToDouble(Grid<char*> &other){
+        Grid<double> result(other.rows(), other.cols());
+        for(size_t i = 0; i < other.size(); i++){
+            result.values[i] = atof( other.values[i]);
+        }
+        return result;
     }
 
     template<class T2>
@@ -225,6 +235,26 @@ public:
         values = new T[Size]{0};
 
         std::copy(other.values, other.values+Size, values);
+        return *this;
+    }
+
+    Grid& operator =(Grid<std::string> &other){
+        //qDebug() << "ASSIGMENT";
+
+        if(Cols != other.cols() || Rows != other.rows()){
+            delete[] values;
+        }
+
+        Rows = other.rows();
+        Cols = other.cols();
+        Size = other.size();
+
+        values = new T[Size]{0};
+
+        for(size_t i = 0; i < Size; i++){
+            values[i] = atof(other.values[i].c_str());
+        }
+
         return *this;
     }
 

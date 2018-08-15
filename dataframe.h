@@ -9,15 +9,23 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
+struct SCols{
+    Matrix<float>* f_matrices;
+    Matrix<double>* d_matrices;
+    Matrix<std::string>* s_matrices;
+};
 
-template<class T = float>
-class Matrix;
 
-template<class T = float>
-class Dataframe : public Matrix<T> {
+class Dataframe {
 
 private:
     const size_t HEAD_LENGTH = 10;
+
+    size_t Rows = 0;
+    size_t Cols = 0;
+
+public:
+    Matrix<char*>* content;
 
 public:
     class proxy;
@@ -25,8 +33,8 @@ public:
     std::vector<std::string> Col_Titles;
     std::vector<int> FileTitlesIndices;
 
-    Dataframe() : Matrix<T>(){}
-    Dataframe(size_t _rows, size_t _cols, std::vector<std::string> _col_titles = {}) : Col_Titles(_col_titles), Matrix<T>(_rows, _cols){}
+    Dataframe(){}
+    Dataframe(size_t _rows, size_t _cols, std::vector<std::string> _col_titles = {}) : Col_Titles(_col_titles){}
 
     Dataframe(std::string filename, std::initializer_list<std::string> include_Cols = {},  std::initializer_list<std::string> exclude_Cols = {}, size_t max_rows = 0){
         QFile file(filename.c_str());
@@ -34,11 +42,14 @@ public:
 
         size_t FileLength = GetFileLength(file);
 
+
         QList<QByteArray> titles = file.readLine().split(',');
         SetColTitles(titles, include_Cols, exclude_Cols);
 
+        qDebug() << Col_Titles.size();
+        content = new Matrix<char*>[Col_Titles.size()]{};
+        std::fill_n(content, Col_Titles.size(), Matrix<char*>(FileLength, 1));
 
-        *this = Matrix<T>(FileLength-1, Col_Titles.size());
 
         SetValuesFromFile(file);
         file.close();
@@ -46,72 +57,45 @@ public:
 
     ~Dataframe(){}
 
-    Dataframe(const Dataframe &other): Matrix<T>(other){
+
+    Dataframe(const Dataframe &other){
         Col_Titles = other.Col_Titles;
     }
 
-    Dataframe(const Matrix<T> &other): Matrix<T>(other){
-
-    }
 
     Dataframe operator [](std::initializer_list<std::string> titles){
-        Dataframe<T> df_col(this->Rows, titles.size(), titles);
+        Dataframe df_col(this->Rows, titles.size(), titles);
 
         for(size_t c = 0;  c < titles.size();c++){
             size_t col_i = GetColIndex(*(titles.begin()+c));
 
-            for(size_t r = 0; r < this->Rows;r++){
-                df_col[r][c] = this->values[r*this->Cols+col_i];
-            }
+            df_col.content[col_i] = content[col_i];
         }
-        qDebug() << df_col[0][0];
+        qDebug() << QString::fromStdString(df_col.content[0][0][0]);
         return df_col;
     }
-
+    /*
     proxy operator [](size_t r){
         return proxy(r, *this);
     }
 
     Dataframe &operator =(const Dataframe &other){
-        Matrix<T>::operator =(other);
         Col_Titles = other.Col_Titles;
         return *this;
     }
 
-
-
-    template<class T2>
-    Dataframe &operator =(const Matrix<T2> &other){
-        Matrix<T>::operator =(other);
-        return *this;
-    }
-
-    template<class T2>
-    Dataframe &operator *(const Matrix<T2> &other){
-        Matrix<T>::operator *(other);
-        return *this;
-    }
-
+    */
     void SetValuesFromFile(QFile &opened_file){
         size_t line_i = 0;
         while(!opened_file.atEnd()){
             QList<QByteArray> lineSplit = opened_file.readLine().split(',');
 
+
             size_t col_i = 0;
-            if(Col_Titles.size() > 0){
-                for(auto value : FileTitlesIndices){
-                    this->values[line_i*this->Cols +col_i] = atof(lineSplit[value].data());
-                    col_i++;
-                }
-            }else{
-                for(auto value : lineSplit){
-                    if(value.isEmpty()){
-                        this->values[line_i*this->Cols +col_i] = double(0);
-                    }else{
-                        this->values[line_i*this->Cols +col_i] = atof(value.data());
-                    }
-                    col_i++;
-                }
+            for(auto i : FileTitlesIndices){
+                std::copy(lineSplit[i].data(), sizeof(lineSplit[i].data()), content[col_i][line_i][0]);
+                //content[col_i][line_i][0] = lineSplit[i].data();
+                col_i++;
             }
 
             line_i++;
@@ -142,7 +126,7 @@ public:
             title_i++;
         }
     }
-
+/*
     virtual T GetHighestInCol(size_t col_i)override{
         T Highest = this->values[col_i*this->Cols];
         for(size_t i = 0; i < this->Cols; i++){
@@ -158,7 +142,7 @@ public:
         }
         return Lowest;
     }
-
+*/
     int GetColIndex(std::string value){
         int i = 0;
         for(std::string it : Col_Titles){
@@ -167,6 +151,7 @@ public:
         }
         return -1;
     }
+
 
     int GetFileLength(QFile &opened_file){
         opened_file.reset();
@@ -178,7 +163,7 @@ public:
         opened_file.reset();
         return lineCount;
     }
-
+    /*
     std::vector<std::string> GetVector(QList<QByteArray> &qlist){
         std::vector<std::string> vec;
         for(auto elem : qlist){
@@ -224,12 +209,12 @@ public:
         return Pulled;
 
     }
+    */
 };
 
-template<class T>
-class Dataframe<T>::proxy : public Grid<T>::proxy{
+class Dataframe::proxy{
 public:
-    proxy(size_t _row, Dataframe& _elem) : Grid<T>::proxy(_row, _elem){}
+    proxy(size_t _row, Dataframe& _elem){}
 };
 
 

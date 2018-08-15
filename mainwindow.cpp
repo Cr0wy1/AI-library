@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
    //while(timer.test(1000)){
 
-
+    /*
     //debug << df;
     lr.fit(df, "Preis in Mio");
     //debug << df;
@@ -27,13 +27,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Dataframe<> x_test = test[ {"Gewinn", "Quadratmeter"} ];
     Dataframe<> y_test = test[ {"Preis in Mio"} ];
 
-    debug << x_test;
-    debug << y_test;
 
     Dataframe<> y_test_pred = lr.predict(x_test);
-    debug << lr.GetR2Score(y_test, y_test_pred);
+    debug << y_test_pred;
+    //debug << lr.GetR2Score(y_test, y_test_pred);
 
+    */
 
+    debug << df.content[0][0][0];
 
 
     Matrix<double> mx({
@@ -54,22 +55,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                           {10}
                       });
 
-
+    debug << mx;
 
     //debug << mx;
 
-
+    /*
     lr2.fit(mx, my);
     debug << lr2.predict({3, 7});
     //debug << lr2.GetR2Score();
     debug << lr2.GetB();
-
-    debug << lr2;
-
-    debug << df[1][1];
-    debug << df;
-    auto df2 = df[{"Preis in Mio"}];
-    debug << df2;
+    */
 
 }
 

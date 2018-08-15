@@ -25,6 +25,7 @@ public:
     ~Matrix(){}
 
     //Copy Constructor
+    /*
     template<class T2>
     Matrix(const Matrix<T2> &other) : Grid<T>(other){}
 
@@ -40,7 +41,10 @@ public:
             value++;
         }
     }
+    */
 
+    Matrix(const Grid<T> &other) : Grid<T>(other){
+    }
 
     void ARange(T start, T interval = 0){
         if(interval != 0){
@@ -85,6 +89,10 @@ public:
         return AddSub(other, std::minus<T>());
     }
 
+    Matrix operator* (const Matrix<std::string> &other){
+        qDebug() << "Cannot multiply with a string Matrix!";
+    }
+
     template<class T2>
     Matrix<T> operator* (const Matrix<T2> &other){
         if(this->Cols != other.rows()){
@@ -103,8 +111,7 @@ public:
         return m;
     }
 
-    template<class T2>
-    Matrix operator* (T2 number){
+    Matrix operator* (T number){
         Matrix m = Matrix(this->Rows, this->Cols);
         for(auto it = this->begin(); it != this->end();it++){
             m[it.Row][it.Col] = *it * number;
@@ -117,8 +124,18 @@ public:
         return *this;
     }
 
+    Matrix &operator =(Grid<T> &other){
+        Grid<T>::operator =(other);
+        return *this;
+    }
+
+    Matrix &operator =(Matrix<char*> &other){
+        Grid<T>::operator =(other);
+        return *this;
+    }
+
     template<class T2>
-    Matrix &operator =(const Matrix<T2> &other){
+    Matrix &operator =(Matrix<T2> &other){
         Grid<T>::operator =(other);
         return *this;
     }

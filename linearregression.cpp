@@ -12,11 +12,11 @@ Matrix<double> LinearRegression::predict(){
     return result;
 }
 
-Dataframe<double> LinearRegression::predict(Dataframe<> &df_x){
-    Matrix<double> result(df_x.rows(), df_x.cols());
+Matrix<double> LinearRegression::predict(Dataframe &df_x){
+    Matrix<double> result(df_x.content[0].rows(), df_x.content[0].cols());
     result.AddCol(0,1);
 
-    return Dataframe<double> (result*B);
+    return result*B;
 }
 
 double LinearRegression::predict(std::initializer_list<double> values){
@@ -32,9 +32,10 @@ double LinearRegression::predict(std::initializer_list<double> values){
 }
 
 
-double LinearRegression::GetR2Score(Dataframe<> &df_y, Dataframe<> &df_y_pre){
-    Matrix<double> df_Y = df_y;
-    double pre_y = (df_Y.transpose() * df_y_pre)[0][0];
+double LinearRegression::GetR2Score(Dataframe &df_y, Dataframe &df_y_pre){
+    Matrix<double> df_Y = Matrix<double>::ToDouble(df_y.content[0]);
+    Matrix<double> df_Y_pre = Matrix<double>::ToDouble(df_y_pre.content[0]);
+    double pre_y = (df_Y.transpose() * df_Y_pre)[0][0];
     double mean_y = (df_Y.transpose() * df_Y)[0][0];
 
     return 1 - ( pre_y / mean_y);

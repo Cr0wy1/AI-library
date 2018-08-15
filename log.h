@@ -16,9 +16,6 @@ class Matrix;
 template<class T>
 class Grid;
 
-template<class T>
-class Dataframe;
-
 class LinearRegression;
 
 class Log{
@@ -46,8 +43,7 @@ public:
         Print(*grid);
     }
 
-    template<class T>
-    void operator <<(const Dataframe<T> &dataframe){
+    void operator <<(const Dataframe &dataframe){
         qDebug() << "Dataframe: ";
         QString s;
 
@@ -56,8 +52,9 @@ public:
         }
 
         qDebug() << "    " << s;
-        Grid<T> *grid = const_cast<Dataframe<T>*>(&dataframe);
-        Print(*grid);
+        Grid<double> grid = Matrix<double>::ToDouble( dataframe.content[0]);
+        //qDebug() << dataframe.content[0][0][0];
+        Print(grid);
     }
 
     template<class T>

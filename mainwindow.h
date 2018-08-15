@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <performancetimer.h>
 #include <log.h>
-#include <linearregression.h>
 
 namespace Ui {
 class MainWindow;
@@ -26,10 +25,10 @@ private:
 
     Log debug;
     PerformanceTimer timer;
-    Dataframe<> df = Dataframe<>("hotels.csv", {}, {"Stadt\n"});
+    Dataframe df = Dataframe("hotels.csv", {}, {"Stadt\n"});
 
-    LinearRegression lr;
-    LinearRegression lr2;
+    //LinearRegression lr;
+    //LinearRegression lr2;
 };
 
 #endif // MAINWINDOW_H
